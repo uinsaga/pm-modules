@@ -1,4 +1,4 @@
-```markdown
+
 # 📱 Pemrograman Mobile (Figma to Flutter)
 
 Repository ini berisi materi dan panduan perkuliahan **Pemrograman Mobile** berbasis *Project-Based Learning*. Perkuliahan diawali dengan pemahaman konsep dasar UI/UX, perancangan antarmuka di Figma, pembekalan *coding* dasar Flutter sebelum UTS, dan difokuskan pada *studio slicing* project mandiri setelah UTS.
@@ -58,4 +58,3 @@ Repository ini berisi materi dan panduan perkuliahan **Pemrograman Mobile** berb
 * **SDK:** Flutter SDK, Git
 * **Testing Device:** Smartphone Android (USB Debugging Enabled) / Android Emulator
 
-```
