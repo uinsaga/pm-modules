@@ -20,10 +20,10 @@ Repository ini berisi materi dan panduan perkuliahan **Pemrograman Mobile** berb
 * 📖 [**Pertemuan 1:** Pengenalan Mobile Dev, Konsep UI/UX, & Anatomi Desain](./materials/week-01.md)
 * 📖 [**Pertemuan 2:** Ideasi Produk Aplikasi, User Flow, & Low-Fi Wireframing](./materials/week-02.md)
 * 📖 [**Pertemuan 3:** Design System di Figma (Color Palette, Typography, Tokens, & Auto Layout)](./materials/week-03.md)
-* 📖 [**Pertemuan 4:** Slicing Visual UI Design (High-Fidelity Layouting di Figma)](./materials/week-04.md)
-* 📖 [**Pertemuan 5:** Interactive Prototyping, Micro-Interactions, & Figma Hand-Off](./materials/week-05.md)
-* 📖 [**Pertemuan 6:** Setup Environment Tools & Basic Flutter 1 (Core Widgets & Layouting Row/Column)](./materials/week-06.md)
-* 📖 [**Pertemuan 7:** Basic Flutter 2 (Styling, Form Input, Scrollable List, & Simple Navigation)](./materials/week-07.md)
+* 📖 [**Pertemuan 4:** Pengenalan Flutter, Dasar Bahasa Dart, Arsitektur, Setup Environment, dan Running Aplikasi Pertama](./materials/week-04.md)
+* 📖 [**Pertemuan 5:** Praktikum Layouting, Input Widget, Navigation, dan Pembuatan Halaman Login & Register](./materials/week-05.md)
+* 📖 [**Pertemuan 6:** Refactoring Navigasi ke Named Routes & Passing Data Email](./materials/week-06.md)
+* 📖 [**Pertemuan 7:** Dynamic List (`ListView.builder`), Interactive Forms, dan State Management](./materials/week-07.md)
 * 🎯 **Pertemuan 8:** **UTS (Demo Prototype Figma + Live Coding Basic Flutter)**
 
 ---

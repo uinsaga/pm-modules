@@ -1,91 +1,440 @@
-# Pertemuan 5: Interactive Prototyping, Micro-Interactions, & Figma Hand-Off
+# Handout Pertemuan 6: Refactoring Navigasi ke Named Routes & Passing Data Email
 
-**Kembali ke:** [Daftar Isi](../README.md)
+**Mata Kuliah:** Pemrograman Mobile
 
----
+**Modul:** Pertemuan 6
 
-## 🎯 Target Pembelajaran
-Di akhir pertemuan ini, mahasiswa diharapkan mampu:
-1. Mengubah rancangan *High-Fidelity* statis menjadi **Interactive Prototype** yang dapat disimulasikan di perangkat mobile.
-2. Mengimplementasikan **Micro-Interactions** (seperti *Hover/Pressed State*, *Overlays*, dan *Smart Animate*).
-3. Mengatur struktur alur navigasi aplikasi sesuai diagram *User Flow* (Pertemuan 2).
-4. Melakukan persiapan **Figma Hand-Off** (membaca ukuran *spacing*, mengekstrak warna, dan mengunduh aset gambar/ikon untuk koding Flutter).
+**Topik Utama:** Refactoring Navigasi menggunakan *Named Routes*, Pengiriman Data *Email* Antarhalaman, dan Penggunaan `pushReplacementNamed`
 
 ---
 
-## ⏱️ Rincian Alokasi Waktu (150 Menit)
+## 1. Pendahuluan & Tujuan Pembelajaran
 
-| Sesi | Durasi | Aktivitas Utama | Output |
-| :--- | :---: | :--- | :--- |
-| **Sesi 1: Briefing & Demo** | 20 Menit | Demo Prototyping Connections, Smart Animate, & Overlay Pop-up | Pemahaman Prototyping |
-| **Sesi 2: Hands-on Prototyping** | 60 Menit | Hubungkan 5 Layar Utama & Atur Transisi Halaman di Canvas Figma | Prototype Interaktif |
-| **Sesi 3: Micro-Interactions & Hand-Off** | 50 Menit | Menambahkan State Tombol, Pop-up Modal, & Inspeksi Dev Mode Figma | Asset & Spec Siap Slicing |
-| **Sesi 4: Review & Asistensi** | 20 Menit | Uji Coba Running Prototype di Figma Mirror / Mobile App | Pengesahan Prototype |
+Pada Pertemuan 5, kita telah membuat form **Login** dan **Register** di dalam folder `lib/pages/`. Pada saat itu, perpindahan halaman masih menggunakan *Anonymous Route* (`Navigator.push`).
 
----
+Pada Pertemuan 6 ini, kita akan melakukan **Refactoring** (pembaharuan struktur kode):
 
-## 📖 1. Materi Utama (20 Menit)
-
-### A. Anatomi Interactive Prototyping
-*Prototyping* di Figma memungkinkan kita menguji alur aplikasi (*usability testing*) tanpa harus menulis sebaris kode pun.
-
-* **Nodal Connections (Hotspots):** Elemen pemicu (contoh: tombol) yang ditarik gariskaitnya menuju layar tujuan.
-* **Triggers:** Aksi pengguna yang memicu reaksi (`On Click`, `On Drag`, `While Hovering`, `While Pressing`).
-* **Action Types:** 
-  * `Navigate to`: Perpindahan layar standar.
-  * `Open Overlay`: Membuka jendela dialog/modal/bottom sheet melayang di atas layar aktif.
-  * `Scroll to`: Berpindah posisi ke bagian tertentu dalam satu layar (*anchor link*).
-* **Smart Animate:** Fitur animasi otomatis Figma yang mencocokkan layer identik antar layar untuk memberikan transisi halus (seperti animasi *hero image* yang membesar).
+1. Mengubah seluruh navigasi aplikasi menggunakan **Named Routes** yang terdaftar di `main.dart`.
+2. Mengirimkan **Email** yang diinput saat Login ke **Home Page** dan **Profile Page**.
+3. Menggunakan `pushReplacementNamed` agar setelah berhasil Login, pengguna **tidak bisa kembali (*back*)** ke halaman Login.
 
 ---
 
-### B. Konsep Figma Hand-Off untuk Developer
-Sebelum masuk ke Flutter minggu depan, mahasiswa harus paham cara membaca spesifikasi dari Figma ke dalam kode:
+### Alur Navigasi Aplikasi
 
-1. **Dev Mode (`Shift + D`):** Fitur khusus untuk menginspeksi nilai CSS/Flutter (*padding, margin, border-radius, color hex*).
-2. **Asset Exporting:** Menandai ikon dan gambar agar siap diunduh dalam format PNG/SVG untuk dimasukkan ke folder proyek Flutter (`assets/images/` atau `assets/icons/`).
+```text
+[ Register Page ('/register') ] ──(Pop / Back)──┐
+                                               ▼
+                                      [ Login Page ('/') ]
+                                               │
+                                 (Login & Pass Email Data)
+                                               │
+                                               ▼ (pushReplacementNamed)
+                                     [ Home Page ('/home') ]
+                                               │
+                                         (Pass Email Data)
+                                               │
+                                               ▼ (pushNamed)
+                                   [ Profile Page ('/profile') ]
 
----
-
-## 🛠️ 2. Aktivitas Praktik Studio (110 Menit)
-
-### Tahap 1: Menghubungkan Alur Layar Utama (60 Menit)
-1. Buka tab **`Prototype`** di panel sebelah kanan Figma.
-2. **Splash / Auth Flow:**
-   * Sambungkan tombol `Get Started` pada Splash Screen ke Layar **Login**.
-   * Sambungkan tombol `Login` ke **Home Dashboard**.
-3. **Home & Navigation Flow:**
-   * Sambungkan item kartu produk pada Home Dashboard ke Layar **Detail View**.
-   * Hubungkan ikon *Profile* di *Bottom Navigation Bar* ke Layar **User Profile**.
-   * Atur agar *Bottom Navigation Bar* bersifat **Fixed (Stay in position)** saat konten layar di-*scroll*.
-
----
-
-### Tahap 2: Micro-Interactions & Prep Hand-Off (50 Menit)
-1. **Membuat Interactive Components (State Button):**
-   * Masuk ke halaman `🎨 Design System`.
-   * Pada komponen `Button`, hubungkan state `Default` ke state `Hover/Pressed` menggunakan trigger `While Hovering` / `While Pressing` dengan transisi `Smart Animate (Ease In 150ms)`.
-2. **Modal Overlay (Bottom Sheet / Dialog Box):**
-   * Buat layar kecil untuk konfirmasi Logout / Filter Produk.
-   * Hubungkan pemicu ke layar tersebut dengan opsi `Open Overlay` (Centang *Close when clicking outside* & *Add background overlay*).
-3. **Exporting Assets:**
-   * Seleksi ikon-ikon utama dan gambar logo.
-   * Pada panel kanan bawah, buka opsi **Export** ➡️ Pilih format **SVG** (untuk ikon) atau **PNG @2x** (untuk foto) ➡️ Export ke folder lokal laptop.
+```
 
 ---
 
-## 🔍 3. Asistensi & Review (20 Menit)
+## 2. Struktur Berkas Proyek
 
-Demonstrasikan **Figma Prototype** kelompok ke Dosen/Asisten Lab:
-* Jalankan fitur **Present Mode (`Ctrl + Alt + Enter` / `Cmd + Option + Enter`)** atau buka via aplikasi **Figma Mirror** di HP.
-* Uji coba alur dari *Splash Screen* ➡️ *Login* ➡️ *Home* ➡️ *Detail* ➡️ *Profile*.
-* Pastikan tidak ada tombol "mati" (tombol yang diklik tetapi tidak merespons alur).
+Pastikan struktur berkas di dalam proyek Anda sudah sesuai dan semua file halaman berada di dalam direktori `lib/pages/`:
+
+```text
+lib/
+├── pages/
+│   ├── login_page.dart    (Diperbarui dari Pertemuan 5)
+│   ├── register_page.dart (Diperbarui dari Pertemuan 5)
+│   ├── home_page.dart     (Baru)
+│   └── profile_page.dart  (Baru)
+└── main.dart              (Diperbarui - Pendaftaran Route)
+
+```
 
 ---
 
-## 📝 Checkpoint & Tugas Minggu 5
+## 3. Langkah Praktikum
 
-- [ ] Interactive Prototype untuk 5 Layar Utama berfungsi 100% tanpa *break* alur.
-- [ ] Terdapat animasi *Smart Animate* / Micro-Interactions sederhana pada tombol atau navigasi.
-- [ ] Seluruh aset gambar dan ikon telah di-export dalam format PNG/SVG.
-- [ ] Proyek Figma Fase 1 **Resmi Fix** dan siap di-hand-off ke Flutter pada Pertemuan 6 (Setup & Basic Flutter 1).
+---
+
+### Langkah 1: Registrasi Named Routes Terpusat (`lib/main.dart`)
+
+Buka `lib/main.dart`, *import* seluruh halaman dari direktori `pages/`, lalu daftarkan nama rute aplikasi di dalam `MaterialApp`.
+
+```dart
+import 'package:flutter/material.dart';
+import 'pages/login_page.dart';
+import 'pages/register_page.dart';
+import 'pages/home_page.dart';
+import 'pages/profile_page.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Praktikum Pertemuan 6',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        useMaterial3: true,
+      ),
+
+      // 1. Menentukan halaman awal saat aplikasi dibuka (Login)
+      initialRoute: '/',
+
+      // 2. Pemetaan nama rute aplikasi
+      routes: {
+        '/': (context) => const LoginPage(),
+        '/register': (context) => const RegisterPage(),
+        '/home': (context) => const HomePage(),
+        '/profile': (context) => const ProfilePage(),
+      },
+    );
+  }
+}
+
+```
+
+---
+
+### Langkah 2: Memperbarui Halaman Login (`lib/pages/login_page.dart`)
+
+Mengambil data **Email** yang diinputkan pengguna, lalu mengirimkannya ke `/home` menggunakan `arguments`.
+
+```dart
+import 'package:flutter/material.dart';
+
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  // Controller email dari Pertemuan 5
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _doLogin() {
+    String emailInput = _emailController.text.trim();
+
+    if (emailInput.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Email tidak boleh kosong!')),
+      );
+      return;
+    }
+
+    // Pindah ke Halaman Home sambil membawa data EMAIL.
+    // Menggunakan pushReplacementNamed agar halaman Login dihapus dari stack.
+    Navigator.pushReplacementNamed(
+      context,
+      '/home',
+      arguments: emailInput, // Passing data email (String)
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Login')),
+      body: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.lock_person, size: 70, color: Colors.blue),
+            const SizedBox(height: 20),
+            
+            // Input Email
+            TextField(
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
+              decoration: const InputDecoration(
+                labelText: 'Email',
+                hintText: 'contoh@email.com',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.email),
+              ),
+            ),
+            const SizedBox(height: 12),
+            
+            // Input Password
+            TextField(
+              controller: _passwordController,
+              obscureText: true,
+              decoration: const InputDecoration(
+                labelText: 'Password',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.lock),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Tombol Login
+            ElevatedButton(
+              onPressed: _doLogin,
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size.fromHeight(48),
+              ),
+              child: const Text('LOGIN'),
+            ),
+            const SizedBox(height: 12),
+
+            // Ke Halaman Register
+            TextButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/register');
+              },
+              child: const Text('Belum punya akun? Register'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+```
+
+---
+
+### Langkah 3: Memperbarui Halaman Register (`lib/pages/register_page.dart`)
+
+```dart
+import 'package:flutter/material.dart';
+
+class RegisterPage extends StatelessWidget {
+  const RegisterPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Register')),
+      body: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const TextField(
+              decoration: InputDecoration(
+                labelText: 'Nama Lengkap',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 12),
+            const TextField(
+              decoration: InputDecoration(
+                labelText: 'Email',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                // Kembali ke Halaman Login
+                Navigator.pop(context);
+              },
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size.fromHeight(48),
+              ),
+              child: const Text('DAFTAR & KEMBALI KE LOGIN'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+```
+
+---
+
+### Langkah 4: Membuat Halaman Home (`lib/pages/home_page.dart`)
+
+Halaman Home menangkap **Email** yang dikirim dari Login Page dan menampilkannya pada teks ucapan selamat datang.
+
+```dart
+import 'package:flutter/material.dart';
+
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // Tangkap data email yang dikirim dari halaman Login
+    final String emailDiterima =
+        ModalRoute.of(context)!.settings.arguments as String? ?? 'User';
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Home Page'),
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () {
+              // Logout: Kembali ke Login Page dan hapus stack halaman
+              Navigator.pushReplacementNamed(context, '/');
+            },
+          ),
+        ],
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.home_rounded, size: 80, color: Colors.blue),
+              const SizedBox(height: 16),
+              const Text(
+                'Selamat Datang!',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              
+              // Menampilkan Email yang dikirim saat Login
+              Text(
+                'Logged in as: $emailDiterima',
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.blue,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+
+              const SizedBox(height: 32),
+              ElevatedButton.icon(
+                onPressed: () {
+                  // Meneruskan data email ke Halaman Profile
+                  Navigator.pushNamed(
+                    context,
+                    '/profile',
+                    arguments: emailDiterima,
+                  );
+                },
+                icon: const Icon(Icons.person),
+                label: const Text('Lihat Profile'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+```
+
+---
+
+### Langkah 5: Membuat Halaman Profile (`lib/pages/profile_page.dart`)
+
+Halaman Profile menerima data email yang diteruskan dari `HomePage`.
+
+```dart
+import 'package:flutter/material.dart';
+
+class ProfilePage extends StatelessWidget {
+  const ProfilePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // Tangkap data email yang diteruskan dari Home Page
+    final String emailDiterima =
+        ModalRoute.of(context)!.settings.arguments as String? ?? 'User';
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Profile'),
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const CircleAvatar(
+                radius: 50,
+                backgroundColor: Colors.blue,
+                child: Icon(Icons.person, size: 60, color: Colors.white),
+              ),
+              const SizedBox(height: 20),
+              
+              // Menampilkan email pengguna
+              Text(
+                emailDiterima,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Status: Mahasiswa / User Aktif',
+                style: TextStyle(color: Colors.grey),
+              ),
+
+              const SizedBox(height: 32),
+              OutlinedButton.icon(
+                onPressed: () {
+                  // Kembali ke Home Page
+                  Navigator.pop(context);
+                },
+                icon: const Icon(Icons.arrow_back),
+                label: const Text('Kembali ke Home'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+```
+
+---
+
+## 4. Penjelasan Sintaks Kunci
+
+1. **`pushReplacementNamed` vs `pushNamed`:**
+* Pada `LoginPage`, kita menggunakan `pushReplacementNamed(context, '/home')` agar setelah pengguna berhasil masuk ke **Home**, menekan tombol *back* HP **tidak akan membalikkan pengguna ke Halaman Login**.
+* Pada `HomePage` menuju `ProfilePage`, kita menggunakan `pushNamed` biasa agar pengguna **bisa kembali** ke Home dengan `Navigator.pop`.
+
+
+2. **`ModalRoute.of(context)!.settings.arguments as String`:**
+* Digunakan pada halaman tujuan (`HomePage` & `ProfilePage`) untuk mengekstrak variabel string/email yang disisipkan dari halaman sebelumnya.
+
+
+
+---
+
+## 5. Latihan Praktikum Mandiri
+
+1. **Perubahan Teks Email:** Coba ubah ketikan email di halaman Login (misal: `mahasiswa@kampus.ac.id`), lalu amati apakah email di Home Page dan Profile Page otomatis berubah sesuai ketikan Anda.
+2. **Uji Coba Tombol Back:** Cobalah tekan tombol Login, lalu tekan tombol *Back* pada HP/Emulator Anda. Amati mengapa aplikasi tidak kembali ke layar Login (karena penggunaan `pushReplacementNamed`).

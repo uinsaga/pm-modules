@@ -1,98 +1,624 @@
-# Pertemuan 5: Interactive Prototyping, Micro-Interactions, & Figma Hand-Off
+# Handout Pertemuan 5: Praktikum Layouting, Input Widget, Navigation, dan Pembuatan Halaman Login & Register
 
-**Kembali ke:** [Daftar Isi](../README.md)
+**Mata Kuliah:** Pemrograman Mobile
 
----
+**Modul:** Pertemuan 5
 
-## 🎯 Target Pembelajaran
-
-Di akhir pertemuan ini, mahasiswa diharapkan mampu:
-
-1. Mengubah rancangan _High-Fidelity_ statis menjadi **Interactive Prototype** yang dapat disimulasikan di perangkat mobile.
-2. Mengimplementasikan **Micro-Interactions** (seperti _Hover/Pressed State_, _Overlays_, dan _Smart Animate_).
-3. Mengatur struktur alur navigasi aplikasi sesuai diagram _User Flow_ (Pertemuan 2).
-4. Melakukan persiapan **Figma Hand-Off** (membaca ukuran _spacing_, mengekstrak warna, dan mengunduh aset gambar/ikon untuk koding Flutter).
+**Topik Utama:** Layouting Basic (`Column`, `Row`, `Container`, `Padding`), Input Widget (`TextField`), Form Validation, Navigation (`Navigator`), serta Implementasi Halaman Login dan Register
 
 ---
 
-## ⏱️ Rincian Alokasi Waktu (150 Menit)
+## 1. Konsep Dasar Layouting & Input Widget
 
-| Sesi                                      |  Durasi  | Aktivitas Utama                                                   | Output                    |
-| :---------------------------------------- | :------: | :---------------------------------------------------------------- | :------------------------ |
-| **Sesi 1: Briefing & Demo**               | 20 Menit | Demo Prototyping Connections, Smart Animate, & Overlay Pop-up     | Pemahaman Prototyping     |
-| **Sesi 2: Hands-on Prototyping**          | 60 Menit | Hubungkan 5 Layar Utama & Atur Transisi Halaman di Canvas Figma   | Prototype Interaktif      |
-| **Sesi 3: Micro-Interactions & Hand-Off** | 50 Menit | Menambahkan State Tombol, Pop-up Modal, & Inspeksi Dev Mode Figma | Asset & Spec Siap Slicing |
-| **Sesi 4: Review & Asistensi**            | 20 Menit | Uji Coba Running Prototype di Figma Mirror / Mobile App           | Pengesahan Prototype      |
+Pada pertemuan sebelumnya, kita telah mempelajari bahwa di Flutter **segala sesuatu adalah Widget**. Untuk membangun halaman Login dan Register, kita perlu memahami beberapa widget utama berikut:
 
----
+### 1.1 Widget Tata Letak (Layouting)
 
-## 📖 1. Materi Utama (20 Menit)
+* **`Column`**: Menyusun widget anak (*children*) secara **vertikal** (dari atas ke bawah).
+* **`Row`**: Menyusun widget anak secara **horizontal** (dari kiri ke kanan).
+* **`Container`**: Widget serbaguna untuk mengatur dekorasi (warna latar, border, border-radius) serta ukuran (*width*, *height*).
+* **`Padding` / `SizedBox**`:
+* `Padding`: Memberikan jarak di dalam tepi widget (*margin/padding*).
+* `SizedBox`: Memberikan jarak kosong vertikal atau horizontal yang pasti antar-widget.
 
-### A. Anatomi Interactive Prototyping
 
-_Prototyping_ di Figma memungkinkan kita menguji alur aplikasi (_usability testing_) tanpa harus menulis sebaris kode pun.
+* **`SingleChildScrollView`**: Membungkus layout agar layar **bisa di-scroll** secara otomatis saat keyboard muncul (mencegah error *Overflow*).
 
-- **Nodal Connections (Hotspots):** Elemen pemicu (contoh: tombol) yang ditarik gariskaitnya menuju layar tujuan.
-- **Triggers:** Aksi pengguna yang memicu reaksi (`On Click`, `On Drag`, `While Hovering`, `While Pressing`).
-- **Action Types:**
-  - `Navigate to`: Perpindahan layar standar.
-  - `Open Overlay`: Membuka jendela dialog/modal/bottom sheet melayang di atas layar aktif.
-  - `Scroll to`: Berpindah posisi ke bagian tertentu dalam satu layar (_anchor link_).
-- **Smart Animate:** Fitur animasi otomatis Figma yang mencocokkan layer identik antar layar untuk memberikan transisi halus (seperti animasi _hero image_ yang membesar).
+### 1.2 Widget Form & Input Teks
+
+* **`Form`**: Container pembungkus yang mengelola status validasi kumpulan input field.
+* **`TextFormField`**: Widget tempat pengguna mengetikkan teks, dilengkapi fitur *validator*, pemformatan, dan kustomisasi dekorasi (`InputDecoration`).
+* **`GlobalKey<FormState>`**: Kunci unik yang digunakan untuk mengakses status form dan memicu proses validasi (`formKey.currentState!.validate()`).
 
 ---
 
-### B. Konsep Figma Hand-Off untuk Developer
+## 2. Konsep Navigasi Halaman (Navigation & Routing)
 
-Sebelum masuk ke Flutter minggu depan, mahasiswa harus paham cara membaca spesifikasi dari Figma ke dalam kode:
+Navigasi di Flutter bekerja dengan prinsip tumpukan (**Stack / LIFO - Last In, First Out**):
 
-1. **Dev Mode (`Shift + D`):** Fitur khusus untuk menginspeksi nilai CSS/Flutter (_padding, margin, border-radius, color hex_).
-2. **Asset Exporting:** Menandai ikon dan gambar agar siap diunduh dalam format PNG/SVG untuk dimasukkan ke folder proyek Flutter (`assets/images/` atau `assets/icons/`).
+```text
+[ Halaman Register ]  <-- Berada di paling atas (Tampak di Layar)
+[ Halaman Login    ]  <-- Berada di bawahnya
 
----
+```
 
-## 🛠️ 2. Aktivitas Praktik Studio (110 Menit)
+### Fungsi Utama `Navigator`:
 
-### Tahap 1: Menghubungkan Alur Layar Utama (60 Menit)
-
-1. Buka tab **`Prototype`** di panel sebelah kanan Figma.
-2. **Splash / Auth Flow:**
-   - Sambungkan tombol `Get Started` pada Splash Screen ke Layar **Login**.
-   - Sambungkan tombol `Login` ke **Home Dashboard**.
-3. **Home & Navigation Flow:**
-   - Sambungkan item kartu produk pada Home Dashboard ke Layar **Detail View**.
-   - Hubungkan ikon _Profile_ di _Bottom Navigation Bar_ ke Layar **User Profile**.
-   - Atur agar _Bottom Navigation Bar_ bersifat **Fixed (Stay in position)** saat konten layar di-_scroll_.
+1. **`Navigator.push()`**: Menambahkan halaman baru ke atas tumpukan (user bisa kembali ke halaman sebelumnya).
+2. **`Navigator.pop()`**: Menghapus halaman teratas dari tumpukan (kembali ke halaman sebelumnya).
+3. **`Navigator.pushReplacement()`**: Mengganti halaman teratas dengan halaman baru (user **tidak bisa** kembali ke halaman sebelumnya, sangat cocok setelah Login berhasil menuju Dashboard).
 
 ---
 
-### Tahap 2: Micro-Interactions & Prep Hand-Off (50 Menit)
+## 3. Langkah Praktikum: Membuat Aplikasi Login & Register
 
-1. **Membuat Interactive Components (State Button):**
-   - Masuk ke halaman `🎨 Design System`.
-   - Pada komponen `Button`, hubungkan state `Default` ke state `Hover/Pressed` menggunakan trigger `While Hovering` / `While Pressing` dengan transisi `Smart Animate (Ease In 150ms)`.
-2. **Modal Overlay (Bottom Sheet / Dialog Box):**
-   - Buat layar kecil untuk konfirmasi Logout / Filter Produk.
-   - Hubungkan pemicu ke layar tersebut dengan opsi `Open Overlay` (Centang _Close when clicking outside_ & _Add background overlay_).
-3. **Exporting Assets:**
-   - Seleksi ikon-ikon utama dan gambar logo.
-   - Pada panel kanan bawah, buka opsi **Export** ➡️ Pilih format **SVG** (untuk ikon) atau **PNG @2x** (untuk foto) ➡️ Export ke folder lokal laptop.
+Mari kita buat aplikasi sederhana dengan alur berikut:
+
+1. **Halaman Login** (`login_page.dart`)
+2. **Halaman Register** (`register_page.dart`)
+3. **Halaman Home / Dashboard** (`home_page.dart`)
 
 ---
 
-## 🔍 3. Asistensi & Review (20 Menit)
+### Langkah 1: Persiapan Struktur Project
 
-Demonstrasikan **Figma Prototype** kelompok ke Dosen/Asisten Lab:
+1. Buka project Flutter Anda di VS Code.
+2. Di dalam folder `lib/`, buat folder baru bernama `pages/`.
+3. Buat 3 berkas baru di dalam folder `lib/pages/`:
+* `login_page.dart`
+* `register_page.dart`
+* `home_page.dart`
 
-- Jalankan fitur **Present Mode (`Ctrl + Alt + Enter` / `Cmd + Option + Enter`)** atau buka via aplikasi **Figma Mirror** di HP.
-- Uji coba alur dari _Splash Screen_ ➡️ _Login_ ➡️ _Home_ ➡️ _Detail_ ➡️ _Profile_.
-- Pastikan tidak ada tombol "mati" (tombol yang diklik tetapi tidak merespons alur).
+
+
+Struktur folder `lib/` akan menjadi seperti ini:
+
+```text
+lib/
+├── pages/
+│   ├── home_page.dart
+│   ├── login_page.dart
+│   └── register_page.dart
+└── main.dart
+
+```
 
 ---
 
-## 📝 Checkpoint & Tugas Minggu 5
+### Langkah 2: Membuat Halaman Home (`lib/pages/home_page.dart`)
 
-- [ ] Interactive Prototype untuk 5 Layar Utama berfungsi 100% tanpa _break_ alur.
-- [ ] Terdapat animasi _Smart Animate_ / Micro-Interactions sederhana pada tombol atau navigasi.
-- [ ] Seluruh aset gambar dan ikon telah di-export dalam format PNG/SVG.
-- [ ] Proyek Figma Fase 1 **Resmi Fix** dan siap di-hand-off ke Flutter pada Pertemuan 6 (Setup & Basic Flutter 1).
+Halaman sederhana yang akan dituju setelah pengguna berhasil login.
+
+```dart
+import 'package:flutter/material.dart';
+import 'login_page.dart';
+
+class HomePage extends StatelessWidget {
+  final String email;
+
+  const HomePage({super.key, required this.email});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Dashboard Utama'),
+        backgroundColor: Colors.blueAccent,
+        foregroundColor: Colors.white,
+        automaticallyImplyLeading: false, // Menghilangkan tombol back
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.check_circle_outline,
+                size: 80,
+                color: Colors.green,
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Selamat Datang,',
+                style: TextStyle(fontSize: 18, color: Colors.grey),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                email,
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueAccent,
+                ),
+              ),
+              const SizedBox(height: 40),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.redAccent,
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(200, 48),
+                ),
+                onPressed: () {
+                  // Logout dan kembali ke Halaman Login (Replace stack)
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LoginPage(),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.logout),
+                label: const Text('Logout'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+```
+
+---
+
+### Langkah 3: Membuat Halaman Register (`lib/pages/register_page.dart`)
+
+Halaman untuk pendaftaran akun baru dengan validasi konfirmasi password.
+
+```dart
+import 'package:flutter/material.dart';
+
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
+
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
+  final _formKey = GlobalKey<FormState>();
+  final _namaController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+
+  bool _isObscurePassword = true;
+  bool _isObscureConfirm = true;
+
+  @override
+  void dispose() {
+    _namaController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  void _submitRegister() {
+    if (_formKey.currentState!.validate()) {
+      // Jika validasi sukses
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Registrasi Berhasil! Silakan Login.'),
+          backgroundColor: Colors.green,
+        ),
+      );
+      // Kembali ke halaman Login
+      Navigator.pop(context);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Daftar Akun Baru'),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text(
+                  'Buat Akun Anda',
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Lengkapi data di bawah ini untuk mendaftar',
+                  style: TextStyle(color: Colors.grey),
+                ),
+                const SizedBox(height: 24),
+
+                // Field Nama Lengkap
+                TextFormField(
+                  controller: _namaController,
+                  decoration: const InputDecoration(
+                    labelText: 'Nama Lengkap',
+                    prefixIcon: Icon(Icons.person_outline),
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Nama tidak boleh kosong';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // Field Email
+                TextFormField(
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: const InputDecoration(
+                    labelText: 'Email',
+                    prefixIcon: Icon(Icons.email_outlined),
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Email tidak boleh kosong';
+                    }
+                    if (!value.contains('@')) {
+                      return 'Masukkan format email yang valid';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // Field Password
+                TextFormField(
+                  controller: _passwordController,
+                  obscureText: _isObscurePassword,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    prefixIcon: const Icon(Icons.lock_outline),
+                    border: const OutlineInputBorder(),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _isObscurePassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _isObscurePassword = !_isObscurePassword;
+                        });
+                      },
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Password tidak boleh kosong';
+                    }
+                    if (value.length < 6) {
+                      return 'Password minimal 6 karakter';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // Field Konfirmasi Password
+                TextFormField(
+                  controller: _confirmPasswordController,
+                  obscureText: _isObscureConfirm,
+                  decoration: InputDecoration(
+                    labelText: 'Konfirmasi Password',
+                    prefixIcon: const Icon(Icons.lock_reset_outlined),
+                    border: const OutlineInputBorder(),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _isObscureConfirm
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _isObscureConfirm = !_isObscureConfirm;
+                        });
+                      },
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Konfirmasi password tidak boleh kosong';
+                    }
+                    if (value != _passwordController.text) {
+                      return 'Password tidak cocok!';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 24),
+
+                // Tombol Register
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  onPressed: _submitRegister,
+                  child: const Text(
+                    'DAFTAR SEKARANG',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+```
+
+---
+
+### Langkah 4: Membuat Halaman Login (`lib/pages/login_page.dart`)
+
+Halaman utama tempat pengguna memasukkan akun atau berpindah ke halaman Register.
+
+```dart
+import 'package:flutter/material.dart';
+import 'home_page.dart';
+import 'register_page.dart';
+
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  bool _isObscure = true;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _submitLogin() {
+    if (_formKey.currentState!.validate()) {
+      // Pindah ke HomePage dan hapus stack Login (pushReplacement)
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomePage(email: _emailController.text),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Logo / Icon Aplikasi
+                  const Icon(
+                    Icons.lock_person_rounded,
+                    size: 90,
+                    color: Colors.blueAccent,
+                  ),
+                  const SizedBox(height: 16),
+
+                  const Text(
+                    'Selamat Datang',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Silakan masuk ke akun Anda',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                  const SizedBox(height: 32),
+
+                  // Field Email
+                  TextFormField(
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: const InputDecoration(
+                      labelText: 'Email',
+                      prefixIcon: Icon(Icons.email_outlined),
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Email tidak boleh kosong';
+                      }
+                      if (!value.contains('@')) {
+                        return 'Format email salah';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Field Password
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: _isObscure,
+                    decoration: InputDecoration(
+                      labelText: 'Password',
+                      prefixIcon: const Icon(Icons.lock_outline),
+                      border: const OutlineInputBorder(),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isObscure ? Icons.visibility_off : Icons.visibility,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isObscure = !_isObscure;
+                          });
+                        },
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Password tidak boleh kosong';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Tombol Login
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    onPressed: _submitLogin,
+                    child: const Text(
+                      'MASUK',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Navigasi ke Halaman Register
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('Belum punya akun? '),
+                      GestureDetector(
+                        onTap: () {
+                          // Navigasi push ke Halaman Register
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const RegisterPage(),
+                            ),
+                          );
+                        },
+                        child: const Text(
+                          'Daftar di sini',
+                          style: TextStyle(
+                            color: Colors.blueAccent,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+```
+
+---
+
+### Langkah 5: Memperbarui Berkas `lib/main.dart`
+
+Buka berkas `lib/main.dart`, lalu ubah isi kodenya untuk mengarahkan halaman pertama (*home*) ke `LoginPage`.
+
+```dart
+import 'package:flutter/material.dart';
+import 'pages/login_page.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Praktikum Login & Register',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
+        useMaterial3: true,
+      ),
+      home: const LoginPage(),
+    );
+  }
+}
+
+```
+
+---
+
+## 4. Penjelasan Komponen Penting Praktikum
+
+| Komponen / Method | Fungsi Utama |
+| --- | --- |
+| **`TextEditingController`** | Menangkap nilai masukan ketikan pengguna secara *real-time* dan memanipulasi isi teks. |
+| **`obscureText: true`** | Menyembunyikan karakter password menjadi titik-titik (`•••`). |
+| **`dispose()`** | Menghapus controller dari memori saat widget ditutup untuk mencegah *memory leak*. |
+| **`validator`** | Fungsi logika pengecekan input field (mengembalikan pesan error jika tidak sesuai, atau `null` jika valid). |
+| **`SingleChildScrollView`** | Menghindari error piksel melebihi layar (*bottom overflowed by xx pixels*) saat papan ketik (*keyboard*) muncul. |
+
+---
+
+## 5. Tugas Praktikum Pertemuan 5
+
+Lakukan modifikasi pada aplikasi yang telah dibuat dengan ketentuan berikut:
+
+1. **Kustomisasi Tampilan:**
+Ubah warna utama tema aplikasi (contoh: dari `Colors.blueAccent` menjadi warna kesukaan Anda seperti `Colors.teal` atau `Colors.indigo`).
+2. **Tambah Input Field Baru pada Form Register:**
+Tambahkan input field **"Nomor Telepon"** pada Halaman Register (`register_page.dart`) dengan validasi:
+* Tidak boleh kosong.
+* Hanya boleh menerima karakter angka (`keyboardType: TextInputType.phone`).
+
+
+3. **Uji Validasi Form:**
+* Coba tekan tombol **MASUK** saat email/password kosong, amati pesan error yang muncul.
+* Coba isi password dan konfirmasi password dengan teks yang berbeda pada form pendaftaran, amati pesan validasinya.
