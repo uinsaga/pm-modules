@@ -412,9 +412,44 @@ Perintah ini akan melakukan pemindaian sistem secara menyeluruh.
 
 > **Catatan:** Tanda `[!]` pada *Android toolchain* atau *Xcode* **dapat diabaikan** untuk sementara waktu karena tahap awal ini menggunakan target **Chrome/Web Browser**.
 
+
+## 5.4 Panduan Instalasi Android Toolchain
+Untuk menyelesaikan peringatan [!] Android toolchain pada flutter doctor, Anda perlu menginstal Android Studio dan mengonfigurasi Android SDK.
+
+Berikut adalah langkah-langkah penyelesaiannya:
+## Langkah 1: Instal Android Studio
+
+   1. Unduh installer resmi dari [android.com](https://developer.android.com/studio).
+   2. Jalankan installer dan ikuti wizard setup default. Pastikan opsi Android SDK, Android SDK Platform, dan Android Virtual Device dicentang saat proses instalasi.
+
+## Langkah 2: Instal Android SDK Command-line Tools
+Flutter memerlukan komponen command-line ini untuk berinteraksi dengan Android SDK.
+
+   1. Buka Android Studio.
+   2. Pada jendela utama (atau menu Settings / Preferences), buka SDK Manager (biasanya di bawah menu More Actions atau Tools > SDK Manager).
+   3. Pilih tab SDK Tools.
+   4. Cari dan centang opsi Android SDK Command-line Tools (latest).
+   5. Klik Apply lalu OK untuk mengunduh dan menginstal komponen tersebut.
+
+## Langkah 3: Setujui Lisensi Android (Android Licenses)
+Setelah command-line tools terinstal, Anda harus menyetujui lisensi resmi dari Android.
+
+   1. Buka Terminal (macOS) atau Command Prompt (Windows) baru.
+   2. Jalankan perintah berikut:
+   
+   flutter doctor --android-licenses
+   
+   3. Tekan y (yes) pada setiap pertanyaan lisensi yang muncul di layar hingga selesai.
+
+## Langkah 4: Verifikasi Ulang
+Jalankan kembali perintah verifikasi untuk memastikan statusnya sudah berubah menjadi hijau [✓]:
+
+flutter doctor
+
+
 ---
 
-### 5.4 Konfigurasi Editor (VS Code)
+### 5.5 Konfigurasi Editor (VS Code)
 
 1. Jalankan **Visual Studio Code**.
 2. Buka menu **Extensions** (`Ctrl + Shift + X` / `Cmd + Shift + X`).
